@@ -1,0 +1,8 @@
+body { background: #f8f9fa; }
+.post-content { font-size: 1.1rem; line-height: 1.8; }
+.auth-form input:not([type=checkbox]) {
+  display: block; width: 100%; padding: .375rem .75rem;
+  border: 1px solid #ced4da; border-radius: .375rem; margin-bottom: .5rem;
+}
+.auth-form ul { font-size: .85rem; color: #6c757d; }
+.errorlist { color: #dc3545; list-style: none; padding: 0; }

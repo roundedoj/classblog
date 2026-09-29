@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="mb-4">Latest Articles</h1>
+
+{% if request.GET.q %}
+  <p class="text-muted">Results for "<strong>{{ request.GET.q }}</strong>" ·
+    <a href="{% url 'home' %}">clear</a></p>
+{% endif %}
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for post in posts %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        {% if post.cover_image %}
+          <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}"
+               style="height:180px;object-fit:cover;">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">
+            <a href="{{ post.get_absolute_url }}" class="text-decoration-none">{{ post.title }}</a>
+          </h5>
+          <p class="text-muted small">
+            By {{ post.author.get_full_name|default:post.author.username }} ·
+            {{ post.created_at|date:"M d, Y" }}
+          </p>
+          <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+        </div>
+        <div class="card-footer bg-white small text-muted">
+          ❤️ {{ post.like_count }} &nbsp; 💬 {{ post.comment_count }}
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>No articles found.</p>
+  {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link"
+        href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}">Previous</a></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link"
+        href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}">Next</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}
