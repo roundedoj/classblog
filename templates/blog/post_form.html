@@ -1,17 +1,55 @@
 {% extends 'base.html' %}
 {% block title %}{{ heading }}{% endblock %}
 {% block content %}
-<div class="col-lg-8 mx-auto">
-  <h1 class="mb-4">{{ heading }}</h1>
+<div class="col-lg-8 mx-auto pt-4">
+  <span class="eyebrow">Author</span>
+  <h1 class="display-title" style="font-size:2.2rem;">{{ heading }}</h1>
+  <div class="amber-rule"></div>
+
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {% for field in form %}
-      <div class="mb-3">
-        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-      </div>
-    {% endfor %}
+
+    <div class="panel mb-4">
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+          {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- NEW: additional photos -->
+    <div class="panel mb-4">
+      <span class="eyebrow">Additional photos</span>
+      <p class="form-text mb-3">They appear as a gallery under your article. Need more than 4? Save, then click Edit to add more.</p>
+
+      {{ image_formset.management_form }}
+      {{ image_formset.non_form_errors }}
+
+      {% for f in image_formset %}
+        <div class="photo-row">
+          {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+          {% if f.instance.pk and f.instance.image %}
+            <img src="{{ f.instance.image.url }}" class="photo-thumb" alt="">
+          {% endif %}
+          <div class="flex-grow-1">
+            {{ f.image }}
+            {% for error in f.image.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            <div class="mt-2">{{ f.caption }}</div>
+          </div>
+          {% if f.instance.pk %}
+            <div class="form-check ms-2">
+              {{ f.DELETE }}
+              <label class="form-check-label small" for="{{ f.DELETE.id_for_label }}">Remove</label>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
     <button class="btn btn-primary">Save</button>
     <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
   </form>

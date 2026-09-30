@@ -1,10 +1,15 @@
 from django.contrib import admin
 
-from .models import Comment, Post
+from .models import Comment, Post, PostImage   # CHANGED: PostImage added
 
-admin.site.site_header = 'GIZ Python Class Blog Administration'
+admin.site.site_header = 'GIZ-FMLE Nigeria Python Class Blog Administration'
 admin.site.site_title = 'Blog Admin'
 admin.site.index_title = 'Manage your blog'
+
+
+class PostImageInline(admin.TabularInline):
+    model = PostImage
+    extra = 3
 
 
 @admin.register(Post)
@@ -14,6 +19,7 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content')
     prepopulated_fields = {'slug': ('title',)}
     exclude = ('likes',)
+    inlines = [PostImageInline]
 
 
 @admin.register(Comment)

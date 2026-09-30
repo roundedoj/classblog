@@ -10,7 +10,7 @@ from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView,
 )
 
-from .forms import CommentForm, PostForm
+from .forms import CommentForm, PostForm, PostImageFormSet
 from .models import Comment, Post
 from .permissions import AuthorRequiredMixin, PostOwnerMixin, is_author
 
@@ -44,7 +44,7 @@ class PostDetailView(DetailView):
     context_object_name = 'post'
 
     def get_queryset(self):
-        qs = Post.objects.select_related('author')
+        qs = Post.objects.select_related('author').prefetch_related('images')
         user = self.request.user
         if user.is_superuser:
             return qs
@@ -131,14 +131,44 @@ class MyPostsView(AuthorRequiredMixin, ListView):
         return Post.objects.filter(author=self.request.user)
 
 
-class PostCreateView(AuthorRequiredMixin, CreateView):
+class PostFormsetMixin:
+    success_message = 'Article saved.'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        if 'image_formset' not in ctx:
+            if self.request.method == 'POST':
+                ctx['image_formset'] = PostImageFormSet(
+                    self.request.POST, self.request.FILES, instance=self.object
+                )
+            else:
+                ctx['image_formset'] = PostImageFormSet(instance=self.object)
+        return ctx
+
+    def form_valid(self, form):
+        formset = PostImageFormSet(
+            self.request.POST, self.request.FILES, instance=self.object
+        )
+        if not formset.is_valid():
+            # Show the page again with the photo errors
+            return self.render_to_response(
+                self.get_context_data(form=form, image_formset=formset)
+            )
+        response = super().form_valid(form)   # saves the article
+        formset.instance = self.object        # link the photos to the saved article
+        formset.save()
+        messages.success(self.request, self.success_message)
+        return response
+
+
+class PostCreateView(PostFormsetMixin, AuthorRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
+    success_message = 'Article saved.'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        messages.success(self.request, 'Article saved.')
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -147,14 +177,11 @@ class PostCreateView(AuthorRequiredMixin, CreateView):
         return ctx
 
 
-class PostUpdateView(PostOwnerMixin, UpdateView):
+class PostUpdateView(PostFormsetMixin, PostOwnerMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
-
-    def form_valid(self, form):
-        messages.success(self.request, 'Article updated.')
-        return super().form_valid(form)
+    success_message = 'Article updated.'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

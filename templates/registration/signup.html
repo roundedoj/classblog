@@ -1,20 +1,24 @@
 {% extends 'base.html' %}
 {% block title %}Sign up{% endblock %}
 {% block content %}
-<div class="col-md-5 mx-auto">
-  <h2>Create an account</h2>
-  <p class="text-muted">Sign up to comment on and like articles.</p>
-  <form method="post" class="auth-form">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    {% for field in form %}
-      <div class="mb-2">
-        {{ field.label_tag }} {{ field }}
-        {% if field.help_text %}<div>{{ field.help_text|safe }}</div>{% endif %}
-        {{ field.errors }}
-      </div>
-    {% endfor %}
-    <button class="btn btn-primary mt-2">Sign up</button>
-  </form>
+<div class="col-md-6 col-lg-5 mx-auto pt-4">
+  <span class="eyebrow">Join us</span>
+  <h2 class="mt-1">Create an account</h2>
+  <div class="amber-rule"></div>
+  <p>Sign up to comment on and like articles.</p>
+  <div class="panel">
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <div class="mb-2">
+          {{ field.label_tag }} {{ field }}
+          {% if field.help_text %}<div>{{ field.help_text|safe }}</div>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <button class="btn btn-primary mt-2">Sign up</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

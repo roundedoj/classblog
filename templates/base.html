@@ -4,16 +4,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}GIZ Python Class Blog{% endblock %}</title>
+  <title>{% block title %}GIZ-FMLE Nigeria Python Class Blog{% endblock %}</title>
+
+  <!-- Bootstrap (layout + components) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+
+  <!-- NEW: Fonts. Outfit = headings, Inter = text. Both free (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Our design (must stay LAST so it overrides Bootstrap). ?v=2 forces browsers to reload it -->
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=2">
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg site-nav sticky-top">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'home' %}">📚 GIZ Python Class Blog</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+      <!-- thin-line node logo -->
+      <svg width="28" height="28" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="23" height="23" rx="7" stroke="#1F5A43" stroke-width="2"/>
+        <path d="M9 13 L17 8 M9 13 L17 18" stroke="#1F5A43" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="9" cy="13" r="2.4" fill="#1F5A43"/>
+        <circle cx="17" cy="8" r="1.8" fill="#C69A4A"/>
+        <circle cx="17" cy="18" r="1.8" fill="#1F5A43"/>
+      </svg>
+      <span>GIZ-FMLE Nigeria Python Class Blog</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="mainNav">
@@ -28,24 +47,24 @@
         {% endif %}
       </ul>
 
-      <form class="d-flex me-3 my-2 my-lg-0" method="get" action="{% url 'home' %}">
-        <input class="form-control form-control-sm me-2" type="search" name="q"
+      <form class="d-flex me-lg-3 my-2 my-lg-0" method="get" action="{% url 'home' %}">
+        <input class="form-control form-control-sm search-input me-2" type="search" name="q"
                placeholder="Search articles" value="{{ request.GET.q }}">
-        <button class="btn btn-outline-light btn-sm">Search</button>
+        <button class="btn btn-outline-primary btn-sm">Search</button>
       </form>
 
       <ul class="navbar-nav align-items-lg-center">
         {% if user.is_authenticated %}
-          <li class="nav-item navbar-text me-2">Hi, {{ user.username }}</li>
+          <li class="nav-item navbar-text me-3">Hi, {{ user.username }}</li>
           <li class="nav-item">
             <form method="post" action="{% url 'logout' %}">
               {% csrf_token %}
-              <button class="btn btn-outline-light btn-sm">Log out</button>
+              <button class="btn btn-outline-primary btn-sm">Log out</button>
             </form>
           </li>
         {% else %}
           <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Log in</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Sign up</a></li>
+          <li class="nav-item ms-lg-2"><a class="btn btn-primary btn-sm" href="{% url 'signup' %}">Sign up</a></li>
         {% endif %}
       </ul>
     </div>
@@ -62,8 +81,8 @@
   {% block content %}{% endblock %}
 </main>
 
-<footer class="bg-dark text-light text-center py-3 mt-auto">
-  <small>&copy; GIZ Python Class Blog. Built by Cohort Echo with Django.</small>
+<footer class="site-footer">
+  <span>&copy; GIZ-FMLE Nigeria Python Class Blog</span><span class="dot-amber"></span><span>Built by Cohort Echo with Django</span>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

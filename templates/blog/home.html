@@ -1,34 +1,58 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1 class="mb-4">Latest Articles</h1>
+
+<header class="page-hero">
+  <span class="eyebrow">GIZ-FMLE Nigeria Python Class Blog</span>
+  <h1 class="display-title">Latest Articles</h1>
+  <div class="amber-rule"></div>
+  <!-- You can change this sentence to anything you like -->
+  <p class="lead-text">Ideas, stories and lessons from our class.</p>
+</header>
 
 {% if request.GET.q %}
-  <p class="text-muted">Results for "<strong>{{ request.GET.q }}</strong>" ·
-    <a href="{% url 'home' %}">clear</a></p>
+  <p class="mb-4">Results for "<strong>{{ request.GET.q }}</strong>" <span class="dot-amber"></span>
+    <a href="{% url 'home' %}">clear search</a></p>
 {% endif %}
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
   {% for post in posts %}
     <div class="col">
-      <div class="card h-100 shadow-sm">
+      <article class="post-card">
         {% if post.cover_image %}
-          <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}"
-               style="height:180px;object-fit:cover;">
+          <img src="{{ post.cover_image.url }}" class="post-card__cover" alt="{{ post.title }}">
+        {% else %}
+          <!-- No cover image: geometric placeholder -->
+          <div class="post-card__cover--empty">
+            <svg width="120" height="60" viewBox="0 0 120 60" fill="none" aria-hidden="true">
+              <path d="M15 40 L50 20 L85 35 L105 15" stroke="#1F5A43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="15" cy="40" r="4" fill="#1F5A43"/>
+              <circle cx="50" cy="20" r="4" fill="#1F5A43"/>
+              <circle cx="85" cy="35" r="4" fill="#1F5A43"/>
+              <circle cx="105" cy="15" r="4" fill="#C69A4A"/>
+            </svg>
+          </div>
         {% endif %}
-        <div class="card-body">
-          <h5 class="card-title">
-            <a href="{{ post.get_absolute_url }}" class="text-decoration-none">{{ post.title }}</a>
-          </h5>
-          <p class="text-muted small">
-            By {{ post.author.get_full_name|default:post.author.username }} ·
-            {{ post.created_at|date:"M d, Y" }}
+        <div class="post-card__body">
+          <span class="eyebrow">{{ post.created_at|date:"M d, Y" }}</span>
+          <h2 class="post-card__title">
+            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+          </h2>
+          <p class="small mb-2" style="opacity:.75;">
+            By {{ post.author.get_full_name|default:post.author.username }}
           </p>
-          <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+          <p class="post-card__excerpt">{{ post.content|truncatewords:30 }}</p>
         </div>
-        <div class="card-footer bg-white small text-muted">
-          ❤️ {{ post.like_count }} &nbsp; 💬 {{ post.comment_count }}
+        <div class="post-card__footer">
+          <span class="icon-stat">
+            <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+            {{ post.like_count }}
+          </span>
+          <span class="icon-stat">
+            <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5z"/></svg>
+            {{ post.comment_count }}
+          </span>
         </div>
-      </div>
+      </article>
     </div>
   {% empty %}
     <p>No articles found.</p>
@@ -36,7 +60,7 @@
 </div>
 
 {% if is_paginated %}
-<nav class="mt-4">
+<nav class="mt-5" aria-label="Pages">
   <ul class="pagination justify-content-center">
     {% if page_obj.has_previous %}
       <li class="page-item"><a class="page-link"
